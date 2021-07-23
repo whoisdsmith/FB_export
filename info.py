@@ -1,4 +1,4 @@
-# выводит информацию о группе с помощью атрибута class
+# выводит информацию о группе с помощью xpaths
 # Так как на class подвязаны многие объекты, может выводить лишнюю информацию (например: непрочитанные уведомления)
 
 from selenium import webdriver
@@ -8,15 +8,16 @@ import time
 import re
 
 options = webdriver.ChromeOptions()
-options.add_argument('headless')
+#options.add_argument('headless')
 options.add_argument("--disable-notifications")
-# options.add_argument(
-#    'user_agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')  # для открытия headless-браузера
+options.add_argument(
+    'user_agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')  # для открытия headless-браузера
 browser = webdriver.Chrome(executable_path=r'C:\chromedriver\chromedriver.exe', options=options)
 
 email = input('Email facebook:')
 password = input('Password facebook:')
 url = input('Введите URL на инфо группы:')
+#https://www.facebook.com/groups/1151106061594709/about
 
 def auth_fb():
     try:
@@ -32,31 +33,49 @@ def auth_fb():
         print('Авторизация не выполнена.')
     parse_info()
 
-def clean_html(data):
-    cleaner = re.compile('<.*?>')
-    i = 0
-    for i in range(len(data)):
-        clean_text = re.sub(cleaner,'',data[i])
-        print(clean_text)
-    return clean_text
-
 def parse_info():
-    print('Заходим в Инфо...')
-    html = browser.page_source
-    soup = BeautifulSoup(html, 'html.parser')
-    info = soup.find_all(class_={'d2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh jagab5yi g1cxx5fr ekzkrbhg oo9gr5id',
-                                 'd2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh sq6gx45u j5wam9gi knj5qynh oo9gr5id'
-                                 'd2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh gfeo3gy3 a3bd9o3v knj5qynh oo9gr5id',
-                                 'a8c37x1j ni8dbmo4 stjgntxs l9j0dhe7 ojkyduve',
-                                 'd2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh jagab5yi g1cxx5fr lrazzd5p m9osqain',
-                                 'd2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh gfeo3gy3 a3bd9o3v knj5qynh oo9gr5id hzawbc8m',
-                                 'd2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh a8c37x1j keod5gw0 nxhoafnm aigsh9s9 d3f4x2em fe6kdd0r mau55g9w c8b282yb iv3no6db gfeo3gy3 a3bd9o3v knj5qynh oo9gr5id hzawbc8m',
-                                 'd2edcug0 hpfvmrgz qv66sw1b c1et5uql lr9zc1uh a8c37x1j keod5gw0 nxhoafnm aigsh9s9 d9wwppkn fe6kdd0r mau55g9w c8b282yb mdeji52x sq6gx45u j5wam9gi knj5qynh m9osqain hzawbc8m'
-                                  }) #последние два класса из доп. акка
-    data = []
-    for x in info:
-        data.append(str(x))
+    info_about_group = {
+        'main_title': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[1]/div/div/div/div/div/h2/span/span').text
+        , 'title': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[2]/div[1]/div/div/span/div/div').text
+        , 'accessibility': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div/div[1]/span/span').text
+        , 'access_status': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div/div[2]/span/span').text
+        , 'visibility': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[2]/div[3]/div/div/div[2]/div/div[1]/span/span').text
+        , 'visible_status': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[2]/div[3]/div/div/div[2]/div/div[2]/span/span').text
+        , 'location': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[2]/div[4]/div/div/div[2]/div/div/span/span').text
+        , 'status': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[1]/div/div/div/div/div/div[2]/div[5]/div/div/div[2]/div/div/span/span').text
+    }
 
-    print(clean_html(data))
+    participants = {
+        'main_title': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[3]/div/div/div/div/div/div[1]/div/div/div/div/div/h2/span/span').text
+        ,'admin': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[3]/div/div/div/div/div/div[2]/div[1]/div/div/div[2]/span/div/div/span').text
+    }
+
+    actions = {
+        'main_title': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[4]/div/div/div/div/div/div[1]/div/div/div/div/div/h2/span/span').text
+        ,'todays_news': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[4]/div/div/div/div/div/div[2]/div/div[1]/div/div/div[2]/div/div[1]/span').text
+        ,'last_month_news': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[4]/div/div/div/div/div/div[2]/div/div[1]/div/div/div[2]/div/div[2]/span').text
+        ,'number_followers': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[4]/div/div/div/div/div/div[2]/div/div[2]/div/div/div[2]/div/div[1]/span').text
+        ,'last_month_followers': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[4]/div/div/div/div/div/div[2]/div/div[2]/div/div/div[2]/div/div[2]/span').text
+        ,'creation_date': browser.find_element_by_xpath(
+            '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[4]/div/div[2]/div/div/div/div[2]/div/div/div/div/div/div[2]/div[1]/div/div/div[2]/div/div[2]/span/span').text
+    }
+    print(info_about_group.values())
+    print(participants.values())
+    print(actions.values())
 
 auth_fb()

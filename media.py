@@ -1,4 +1,4 @@
-# Вытягивает картинки из Медиафайлов после первоначальной подгрузки страницы (без прокрутки до начала)
+# Вытягивает ссылки на картинки из Медиафайлов после первоначальной подгрузки страницы (без прокрутки до начала)
 
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -7,15 +7,16 @@ from selenium.common.exceptions import NoSuchElementException
 import time
 
 options = webdriver.ChromeOptions()
-options.add_argument('headless')
+#options.add_argument('headless')
 options.add_argument("--disable-notifications")
-# options.add_argument(
-#    'user_agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')  # для открытия headless-браузера
+options.add_argument(
+   'user_agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')  # для открытия headless-браузера
 browser = webdriver.Chrome(executable_path=r'C:\chromedriver\chromedriver.exe', options=options)
 
 email = input('Email facebook:')
 password = input('Password facebook:')
 url = input('Введите URL на медиа группы:')
+#https://www.facebook.com/groups/1151106061594709/media
 
 def auth_fb():
     try:
